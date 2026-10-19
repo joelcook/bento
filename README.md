@@ -1,182 +1,109 @@
 # Bento
 
-Bento is a familiar lightweight editor rebuilt for 2026: a small native editor
-that opens fast, edits real files, and does not ask you to adopt a whole
-ecosystem first.
+A small native text editor, written in C.
 
-It is for the moment when you need to change a note, script, config file, web
-page, or small project and you do not want a startup screen, account, workspace
-wizard, extension marketplace, or cloud sync pitch. Open the file. Make the
-change. Save it. Move on.
+Bento opens fast, edits local files directly, and stays small enough to read:
+the whole editor is one C file. It's for the edits that don't need an IDE: a
+note, a script, a config file, a web page, a small project. Open the file,
+change it, save it, move on.
 
-For technical users, Bento keeps the local, direct feel of a terminal tool and
-adds the pieces that make repeated editing comfortable: tabs, a project tree,
-search, replace, selections, command palette, file context menus, syntax
-highlighting, undo, session restore, and a GUI render path built to stay light.
-
-## Why Bother?
-
-Most people do not need an IDE every time they touch text. They need a reliable
-place to open files quickly, see what is there, and edit without friction.
-
-That is why lightweight editors worked so well for so many people: they were
-understandable. They respected the file. They opened quickly. They helped
-without taking over.
-
-Bento is that kind of tool, rebuilt around what matters now: fast native UI,
-project-level navigation, modern syntax highlighting, predictable local files,
-and a codebase small enough to reason about.
-
-Bento is not trying to beat a full IDE at being an IDE. It is trying to make the
-small and medium edits feel sharp again.
+Bento started as a fork of antirez's [kilo](https://github.com/antirez/kilo),
+the terminal editor in under 1,000 lines of C, and grew a native GUI and the
+comforts people expect from an editor today.
 
 ## Features
 
-- Native GUI build with raylib.
-- Terminal build with direct VT100 output.
-- Project tree, tabs, session restore, command palette, search, replace, and
-  selections.
-- Recent files, drag/drop open, settings, file context menus, and common line
-  edits like duplicate, move, comment, indent, outdent, and trim whitespace.
-- Syntax highlighting for C, Python, JavaScript, Go, Rust, shell, and Markdown.
-- Single-file core with a small build script.
-- Bench modes for terminal and GUI performance checks.
+- Two builds from one source file: a GUI built on [raylib](https://www.raylib.com/),
+  and a terminal editor that draws with plain VT100 escapes (no curses).
+- Tabs, pinned tabs, a project sidebar, quick open, a command palette, recent
+  files, and session restore.
+- Line editing: duplicate, move up and down, indent and outdent, toggle comment,
+  select next occurrence, and trim trailing whitespace.
+- Syntax highlighting for C and C++, Python, JavaScript and TypeScript, Go,
+  Rust, shell, and Markdown.
+- Light and dark themes, adjustable font size, and drag-and-drop to open files.
+- No accounts, no extensions, no network code. Bento never phones home.
+- Built-in benchmarks for the terminal and GUI render paths.
 
-## Downloads
+## Build
 
-The clean release setup is:
-
-- GitHub Releases for direct downloads from a personal site.
-- itch.io for people who want install and update notifications through the itch
-  desktop app.
-- Source releases for people who want to build it themselves.
-
-Recommended project-site links:
-
-```text
-macOS download:
-https://github.com/OWNER/REPO/releases/latest/download/Bento-macos-arm64.zip
-
-All releases:
-https://github.com/OWNER/REPO/releases/latest
-
-itch page:
-https://OWNER.itch.io/bento
-
-Source:
-https://github.com/OWNER/REPO
-```
-
-Replace `OWNER/REPO` and `OWNER.itch.io` with the real project slugs when the
-release pages exist.
-
-## Platform Support
-
-Bento is portable C, but downloadable app support means shipping and testing one
-artifact per platform. A single binary will not support all platforms.
-
-| Platform | Status | Notes |
-| --- | --- | --- |
-| macOS | First release target | `./release.sh macos` builds a `.app` bundle and zips it. Unsigned builds will show macOS Gatekeeper warnings. Code signing and notarization are the next step for a polished public download. |
-| Linux | Buildable target | `./release.sh linux` creates a tarball with `bento`, `bento-gui`, icon, README, and VERSION. Test on the oldest distro you intend to support, or package as AppImage/Flatpak later. |
-| Windows | Not a promised download yet | The GUI code has Windows branches, but do not call it supported until a Windows build is produced and tested in CI. The terminal build is POSIX-oriented. |
-| Web | Not supported | Bento is a native editor, not a browser app. |
-
-## Updates
-
-The lightweight update hook is distribution-level:
-
-- If users install through the itch app, itch handles update checks and update
-  prompts when new builds are pushed to the same channel.
-- If users download directly from your site, make the button point at GitHub's
-  latest release asset URL so new visitors always get the newest build.
-- Bento itself does not phone home. Adding in-app update checks would mean
-  adding networking, platform updater frameworks, signing concerns, and more
-  code. That is the wrong tradeoff while the goal is to keep Bento small.
-
-If direct-download update notices become necessary later, use the itch
-`wharf/latest` endpoint or a platform updater such as Sparkle for macOS as an
-opt-in release feature, not as part of the core editor loop.
-
-## Building
-
-Terminal:
+You need a C99 compiler. The GUI also needs raylib (`brew install raylib` on
+macOS).
 
 ```sh
-./build.sh terminal
+./build.sh terminal   # builds ./bento
+./build.sh gui        # builds ./bento-gui
 ```
 
-GUI:
+Run them:
+
+```sh
+./bento notes.md
+./bento-gui                  # restores your last session
+./bento-gui notes.md
+./bento-gui --fresh-window   # skip session restore
+```
+
+On macOS, wrap the GUI in a clickable app with its icon:
 
 ```sh
 ./build.sh gui
-```
-
-macOS app bundle:
-
-```sh
 ./build.sh icons
-./build.sh bundle-mac
+./build.sh bundle-mac        # writes bento.app
 ```
 
-Release artifacts:
+## Keyboard
+
+In the GUI, Cmd and Ctrl both work as the modifier.
+
+| Keys | Action |
+| --- | --- |
+| Cmd+P | Quick open |
+| Cmd+Shift+P | Command palette |
+| Cmd+O / Cmd+Shift+O | Open file / open folder |
+| Cmd+Shift+R | Open recent |
+| Cmd+N / Cmd+Shift+N | New file / new window |
+| Cmd+S / Cmd+Alt+S | Save / save all |
+| Cmd+W / Cmd+Shift+T | Close tab / reopen closed tab |
+| Cmd+F | Find |
+| Cmd+G | Go to line |
+| Cmd+D | Duplicate line |
+| Cmd+E | Select next occurrence |
+| Cmd+/ | Toggle comment |
+| Cmd+B | Toggle sidebar |
+| Cmd+= / Cmd+- | Bigger / smaller font |
+| Cmd+, | Settings |
+| Cmd+Q | Quit |
+
+The terminal build keeps kilo's keys: Ctrl-S saves, Ctrl-F finds, Ctrl-Z
+undoes, and Ctrl-Q quits.
+
+## Benchmarks
 
 ```sh
-./release.sh macos
-./release.sh linux
-./release.sh source
+./bento --bench big-file.c
+./bento-gui --bench-gui big-file.c
 ```
 
-The version comes from `VERSION`. You can override it for a build with:
+## Platforms
 
-```sh
-VERSION=0.1.1 ./release.sh macos
-```
+| Platform | Status |
+| --- | --- |
+| macOS | Main target. `./release.sh macos` builds a zipped `.app`. It isn't signed or notarized yet, so macOS will warn the first time you open it. |
+| Linux | Builds. `./release.sh linux` packages both binaries in a tarball. |
+| Windows | Not supported yet. The GUI code has Windows branches, but there's no tested build, and the terminal build is POSIX-only. |
 
-## Publishing
+## Known gaps
 
-Before a public release:
+Bento is at version 0.1.0. Things that don't work yet:
 
-- Pick a real repository slug and replace `OWNER/REPO` in this README.
-- Pick an itch project slug and replace `OWNER/bento`.
-- Add a license if this repository is meant to be open source.
-- For macOS public downloads, plan for code signing and notarization.
+- Replace and replace-all.
+- Line wrap.
+- Idle resource use. Bento uses more CPU and GPU sitting still than it should.
+- C highlighting works but needs polish.
 
-For GitHub Releases, upload the files from `dist/` to a release tagged with the
-same version:
+## Credits
 
-```sh
-./release.sh macos
-./release.sh source
-gh release create "v$(cat VERSION)" dist/* --title "Bento $(cat VERSION)"
-```
-
-For itch.io, push one stable channel per platform. Keep channel names stable so
-updates land on the same install:
-
-```sh
-butler push dist/Bento-macos-arm64.zip OWNER/bento:macos-arm64 --userversion "$(cat VERSION)"
-butler push dist/Bento-linux-arm64.tar.gz OWNER/bento:linux-arm64 --userversion "$(cat VERSION)"
-```
-
-## Personal Site Copy
-
-Use this as a project card on a portfolio page:
-
-```markdown
-### Bento
-
-A familiar lightweight editor rebuilt for 2026.
-
-Bento is a small native editor for notes, scripts, config files, web pages, and
-small projects. It opens fast, edits local files directly, and gives you the
-comforts people expect now: tabs, project tree, command palette, search,
-replace, syntax highlighting, undo, recent files, and session restore.
-
-Under the hood it stays deliberately small: one C-file core, native GUI,
-terminal build, compact render path, and performance bench modes.
-
-[Download](https://github.com/OWNER/REPO/releases/latest)
-[itch.io](https://OWNER.itch.io/bento)
-[Source](https://github.com/OWNER/REPO)
-```
+Bento is built on [kilo](https://github.com/antirez/kilo) by Salvatore
+Sanfilippo. kilo's copyright notice and BSD 2-Clause license are in
+[LICENSE-kilo](LICENSE-kilo).
